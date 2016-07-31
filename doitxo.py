@@ -1,7 +1,10 @@
 from stratagies import *
 from playxo import play_game
-from xo2 import board
-
+board = """
+...
+...
+...
+"""
 def doit(side,xai,oai,board):
     game = play_game(xai,oai,board)
     if game == "x wins!":
@@ -15,11 +18,5 @@ def doit(side,xai,oai,board):
         else:
             return 1
     else:
-        return 0
+        return game
 
-
-swx = 0
-for i in range(20):
-    swx += doit ("x",oneturnai(board,'x'),stupidai(board,'o'),board)
-
-print swx

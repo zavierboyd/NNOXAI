@@ -12,26 +12,23 @@ def play_game(xai,oai,board):
     turn = 0
     win = 0
     while '.' in board:
-        print turn
         if turn%2 == 0:
             x_move = xai(board,'x')
             if board[phonetoboard[x_move]] == '.':
                 board[phonetoboard[x_move]] = 'x'
             else:
-                raise Exception("WARNING: ILLEGAL MOVE DUE TO CROSSES")
+                return -2
         if turn%2 == 1:
             o_move = oai(board,'o')
             if board[phonetoboard[o_move]] == '.':
                 board[phonetoboard[o_move]] = 'o'
             else:
-                raise Exception("WARNING: ILLEGAL MOVE DUE TO NAUGHTS")
+                return -2
         turn += 1
         xwin = anyonewon(board,'x')
         owin = anyonewon(board,'o')
-        print "".join(board)
         if xwin:
             return "x wins!"
         if owin:
             return "o wins!"
-        print turn
-    return "draw"
+    return 0
