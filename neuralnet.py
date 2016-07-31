@@ -130,8 +130,12 @@ class NNXO(NN):
         if self.ihcolumns != self.horows:
             raise Exception('ihmatrix x: {} != homatrix self.ihrows: {}'.format(self.ihcolumns, self.horows))
 
+    def __call__(self,board,side):
+        oside = 'x' if side == 'o' else 'x'
+        return self.calcout(board, side, oside)
+
     def __repr__(self):
-        return 'NNXO(\nihmatrix=%s,\nhomatrix=%s)'%(self.ihmatrix.__repr__(),self.homatrix.__repr__())
+        return "NNXO(\nihmatrix={},\nhomatrix={})".format(self.ihmatrix, self.homatrix)
 
     # Custom Functions
     def mutate(self):
@@ -171,15 +175,23 @@ class NNXO(NN):
         nhomatrix = smix+omix
         return NNXO(nihmatrix,nhomatrix)
 
-    def calcout(self,inputs):
-        # Figures out the best move to make
-        hidden = self.calc(self.ihmatrix,inputs)
+    def transboard(self, inputs, you, them):
+        inputs = filter(lambda i: i != '\n', inputs)
+        return np.array([1 if bit == you else -1 if bit == them else 0 for bit in inputs])
+
+    def calcout(self, inputs, you, them):
+        ins = self.transboard(inputs, you, them)
+        ins = np.hstack((np.array([1]),ins))
+        hidden = self.calc(self.ihmatrix,ins)
         output = self.calc(self.homatrix,hidden)
-        return output
+        move = np.argmax(output.flatten()[1:]) + 1
+        return move
 
     # Class Method Functions
     @classmethod
-    def random(cls,inwidth,hiddenwidth,outwidth):
+    def random(cls, hiddenwidth):
+        inwidth = 9
+        outwidth = 9
         # Input - Hidden Matrix
         ihoffset = np.array([[0]for i in range(inwidth+1)])
         ihoffset[0][0] = 1
@@ -190,8 +202,7 @@ class NNXO(NN):
         hooffset[0][0] = 1
         howeight = np.random.rand(hiddenwidth+1,outwidth)*2-1
         homatrix = np.hstack((hooffset,howeight))
-        return cls(ihmatrix,homatrix)
-
+        return cls(ihmatrix, homatrix)
 
 
 class MutationLearning(object):
@@ -303,3 +314,12 @@ learn = MutationLearning(ins,goal,neuralnet)
 learn(numgenerations,threshold)
 
 print learn
+
+b = """
+x..
+.o.
+x..
+"""
+b = list(b)
+a = NNXO.random(9)
+print a(b,'x')
