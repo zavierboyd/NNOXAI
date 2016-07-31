@@ -80,7 +80,7 @@ class NNB(NN):
         # Breed ihmatrix
         # Get Mixer for Self and Other
         mix = np.random.binomial(1,prob,(self.ihrows,self.ihcolumns))
-        inmix = (np.zeros((self.ihrows,self.ihcolumns))+1)-mix
+        inmix = 1 - mix
         # Mix Them
         smix = mix*self.ihmatrix
         omix = inmix*other.ihmatrix
@@ -89,7 +89,7 @@ class NNB(NN):
 
         # Breed homatrix
         mix = np.random.binomial(1,prob,(self.horows,self.hocolumns))
-        inmix = (np.zeros((self.horows,self.hocolumns))+1)-mix
+        inmix = 1 - mix
         smix = mix*self.homatrix
         omix = inmix*other.homatrix
         nhomatrix = smix+omix
@@ -117,7 +117,81 @@ class NNB(NN):
 
 
 class NNXO(NN):
-    pass
+    """A neural network to play naughts & crosses"""
+    # Built-in Functions
+    def __init__(self,ihmatrix,homatrix):
+        """Makes the neural network using the matrices as weights"""
+        self.ihmatrix = np.array(ihmatrix)
+        self.homatrix = np.array(homatrix)
+        self.ihcolumns = len(self.ihmatrix[0])
+        self.ihrows = len(self.ihmatrix)
+        self.hocolumns = len(self.homatrix[0])
+        self.horows = len(self.homatrix)
+        if self.ihcolumns != self.horows:
+            raise Exception('ihmatrix x: {} != homatrix self.ihrows: {}'.format(self.ihcolumns, self.horows))
+
+    def __repr__(self):
+        return 'NNXO(\nihmatrix=%s,\nhomatrix=%s)'%(self.ihmatrix.__repr__(),self.homatrix.__repr__())
+
+    # Custom Functions
+    def mutate(self):
+        """Makes random changes to the weights"""
+        delta = (random()*2-1)*self.error*2
+        # Make copy of matrix
+        nihmatrix = np.copy(self.ihmatrix)
+        # Get random position on matrix. Can't be first column
+        ihrow = randint(0,len(nihmatrix)-1)
+        ihcolumn = randint(1,len(nihmatrix[0])-1)
+        # Change position's weight
+        nihmatrix[ihrow][ihcolumn] += delta
+        # Repeat for homatrix
+        nhomatrix = np.copy(self.homatrix)
+        horow = randint(0,len(nhomatrix)-1)
+        hocolumn = randint(1,len(nhomatrix[0])-1)
+        nhomatrix[horow][hocolumn] += delta
+        return NNXO(nihmatrix,nhomatrix)
+
+    def breed(self,other,prob=0.33):
+        """"""
+        # Breed ihmatrix
+        # Get Mixer for Self and Other
+        mix = np.random.binomial(1,prob,(self.ihrows,self.ihcolumns))
+        inmix = 1 - mix
+        # Mix Them
+        smix = mix*self.ihmatrix
+        omix = inmix*other.ihmatrix
+        # Add the mixes togeather
+        nihmatrix = smix+omix
+
+        # Breed homatrix
+        mix = np.random.binomial(1,prob,(self.horows,self.hocolumns))
+        inmix = 1 - mix
+        smix = mix*self.homatrix
+        omix = inmix*other.homatrix
+        nhomatrix = smix+omix
+        return NNXO(nihmatrix,nhomatrix)
+
+    def calcout(self,inputs):
+        # Figures out the best move to make
+        hidden = self.calc(self.ihmatrix,inputs)
+        output = self.calc(self.homatrix,hidden)
+        return output
+
+    # Class Method Functions
+    @classmethod
+    def random(cls,inwidth,hiddenwidth,outwidth):
+        # Input - Hidden Matrix
+        ihoffset = np.array([[0]for i in range(inwidth+1)])
+        ihoffset[0][0] = 1
+        ihweight = np.random.rand(inwidth+1,hiddenwidth)*2-1
+        ihmatrix = np.hstack((ihoffset,ihweight))
+        # Hidden - Output Matrix
+        hooffset = np.array([[0]for i in range(hiddenwidth+1)])
+        hooffset[0][0] = 1
+        howeight = np.random.rand(hiddenwidth+1,outwidth)*2-1
+        homatrix = np.hstack((hooffset,howeight))
+        return cls(ihmatrix,homatrix)
+
 
 
 class MutationLearning(object):
@@ -195,3 +269,37 @@ class EvolutionLearning(object):
         for person in self.population:
             out = person.calcout(self.inputs)
             person.calcerror(out,self.goal)
+
+numgens = 50
+threshold = 10**(-3)
+ins = np.array([[1,0,0],[1,1,0],[1,0,1],[1,1,1]])
+goal = np.array([[1,0],[1,1],[1,1],[1,0]])
+inwidth = 2
+hiddenwidth = 6
+outwidth = 1
+popsize = 30
+pops = [NNB.random(inwidth,hiddenwidth,outwidth) for i in range(popsize)]
+cutoff = 10
+
+evolve = EvolutionLearning(ins,goal,popsize,cutoff,pops)
+evolve(numgens,threshold)
+
+numgenerations = 5000
+learnrate = 0.5
+mutaterate = 1
+threshold = 10**(-3)
+ins = np.array([[1,0,0],[1,1,0],[1,0,1],[1,1,1]])
+goal = np.array([[1,0],[1,1],[1,1],[1,0]])
+linear = False
+debug = False
+dodescent = False
+domutate = True
+inwidth = 2
+hiddenwidth = 6
+outwidth = 1
+
+neuralnet = NNB.random(inwidth,hiddenwidth,outwidth)
+learn = MutationLearning(ins,goal,neuralnet)
+learn(numgenerations,threshold)
+
+print learn
