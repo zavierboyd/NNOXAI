@@ -3,6 +3,8 @@ from random import randint,random,choice
 import numpy as np
 from numpy import array
 from math import sqrt,exp,e
+from doitxo import *
+from stratagies import *
 __author__ = 'zavidan'
 linear = False
 
@@ -121,6 +123,8 @@ class NNXO(NN):
     # Built-in Functions
     def __init__(self,ihmatrix,homatrix):
         """Makes the neural network using the matrices as weights"""
+        self.side = 'x'
+        self.oside = 'o'
         self.ihmatrix = np.array(ihmatrix)
         self.homatrix = np.array(homatrix)
         self.ihcolumns = len(self.ihmatrix[0])
@@ -131,8 +135,9 @@ class NNXO(NN):
             raise Exception('ihmatrix x: {} != homatrix self.ihrows: {}'.format(self.ihcolumns, self.horows))
 
     def __call__(self,board,side):
-        oside = 'x' if side == 'o' else 'x'
-        return self.calcout(board, side, oside)
+        self.side = side
+        self.oside = 'x' if side == 'o' else 'x'
+        return self.calcout(board)
 
     def __repr__(self):
         return "NNXO(\nihmatrix={},\nhomatrix={})".format(self.ihmatrix, self.homatrix)
@@ -175,17 +180,25 @@ class NNXO(NN):
         nhomatrix = smix+omix
         return NNXO(nihmatrix,nhomatrix)
 
-    def transboard(self, inputs, you, them):
+    def transboard(self, inputs):
         inputs = filter(lambda i: i != '\n', inputs)
-        return np.array([1 if bit == you else -1 if bit == them else 0 for bit in inputs])
+        return np.array([1 if bit == self.side else -1 if bit == self.oside else 0 for bit in inputs])
 
-    def calcout(self, inputs, you, them):
-        ins = self.transboard(inputs, you, them)
+    def calcout(self, inputs):
+        ins = self.transboard(inputs)
         ins = np.hstack((np.array([1]),ins))
         hidden = self.calc(self.ihmatrix,ins)
         output = self.calc(self.homatrix,hidden)
         move = np.argmax(output.flatten()[1:]) + 1
         return move
+
+    def calcerror(self, goal, outputs):
+        self.error = 0
+        tests = 20
+        for i in range(tests):
+            self.error += doit('x',self,stupidai,board)
+        self.error = sqrt(self.error**2/tests)
+        return self.error
 
     # Class Method Functions
     @classmethod
@@ -281,45 +294,47 @@ class EvolutionLearning(object):
             out = person.calcout(self.inputs)
             person.calcerror(out,self.goal)
 
-numgens = 50
-threshold = 10**(-3)
-ins = np.array([[1,0,0],[1,1,0],[1,0,1],[1,1,1]])
-goal = np.array([[1,0],[1,1],[1,1],[1,0]])
-inwidth = 2
-hiddenwidth = 6
-outwidth = 1
-popsize = 30
-pops = [NNB.random(inwidth,hiddenwidth,outwidth) for i in range(popsize)]
-cutoff = 10
+if __name__ == '__main__':
+    numgens = 50
+    threshold = 10**(-3)
+    ins = np.array([[1,0,0],[1,1,0],[1,0,1],[1,1,1]])
+    goal = np.array([[1,0],[1,1],[1,1],[1,0]])
+    inwidth = 2
+    hiddenwidth = 6
+    outwidth = 1
+    popsize = 30
+    pops = [NNB.random(inwidth,hiddenwidth,outwidth) for i in range(popsize)]
+    cutoff = 10
 
-evolve = EvolutionLearning(ins,goal,popsize,cutoff,pops)
-evolve(numgens,threshold)
+    evolve = EvolutionLearning(ins,goal,popsize,cutoff,pops)
+    evolve(numgens,threshold)
 
-numgenerations = 5000
-learnrate = 0.5
-mutaterate = 1
-threshold = 10**(-3)
-ins = np.array([[1,0,0],[1,1,0],[1,0,1],[1,1,1]])
-goal = np.array([[1,0],[1,1],[1,1],[1,0]])
-linear = False
-debug = False
-dodescent = False
-domutate = True
-inwidth = 2
-hiddenwidth = 6
-outwidth = 1
+    numgenerations = 5000
+    learnrate = 0.5
+    mutaterate = 1
+    threshold = 10**(-3)
+    ins = np.array([[1,0,0],[1,1,0],[1,0,1],[1,1,1]])
+    goal = np.array([[1,0],[1,1],[1,1],[1,0]])
+    linear = False
+    debug = False
+    dodescent = False
+    domutate = True
+    inwidth = 2
+    hiddenwidth = 6
+    outwidth = 1
 
-neuralnet = NNB.random(inwidth,hiddenwidth,outwidth)
-learn = MutationLearning(ins,goal,neuralnet)
-learn(numgenerations,threshold)
+    neuralnet = NNB.random(inwidth,hiddenwidth,outwidth)
+    learn = MutationLearning(ins,goal,neuralnet)
+    learn(numgenerations,threshold)
 
-print learn
+    print learn
 
-b = """
-x..
-.o.
-x..
-"""
-b = list(b)
-a = NNXO.random(9)
-print a(b,'x')
+    gens = 100
+    threshold = 20
+    popsize = 100
+    hiddenwidth = 9
+    popu = [NNXO.random(hiddenwidth) for i in range(popsize)]
+    cut = 10
+
+    xoevolve = EvolutionLearning(board,0,popsize,cut,popu)
+    xoevolve(gens,threshold)
