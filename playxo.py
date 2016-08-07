@@ -6,7 +6,7 @@ def anyonewon(board,side):
     return any([check(p1,p2,p3,side,board) for p1,p2,p3 in positions])
 
 phonetoboard = [0,1,2,3,5,6,7,9,10,11]
-
+see = False
 def play_game(xai,oai,board):
     board = list(board)
     turn = 0
@@ -27,6 +27,8 @@ def play_game(xai,oai,board):
         turn += 1
         xwin = anyonewon(board,'x')
         owin = anyonewon(board,'o')
+        if see:
+            print "".join(board)
         if xwin:
             return "x wins!"
         if owin:
