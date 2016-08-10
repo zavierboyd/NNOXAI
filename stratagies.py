@@ -13,28 +13,34 @@ def stupidai(board,side):
             solution = True
     return play #phone
 
-def checkmove(board,side):
-    positions = [(1,5,9),(2,6,10),(3,7,11),(1,2,3),(5,6,7),(9,10,11),(1,6,11),(3,6,9)]
-    for i in range(len(positions)):
-        p1,p2,p3 = positions[i]
-        if board[p1] == side and board[p2] == side and board[p3] == '.':
-            return boardtophone[p3] #phone
-        if board[p1] == side and board[p3] == side and board[p2] == '.':
-            return boardtophone[p2] #phone
-        if board[p2] == side and board[p3] == side and board[p1] == '.':
-            return boardtophone[p1] #phone
-    return 0 #error
+class oneturnai(object):
+    def __init__(self):
+        self.trainingdata = {}
 
-def oneturnai(board,side):
-    if side == 'x':
-        otherside = 'o'
-    else:
-        otherside = 'x'
-    prediction = checkmove(board,otherside)
-    move = checkmove(board,side)
-    if move != 0:
-        return move #phone
-    elif prediction != 0:
-        return prediction #phone
-    else:
-        return stupidai(board,side) #phone
+    def __call__(self, board, side):
+        if side == 'x':
+            otherside = 'o'
+        else:
+            otherside = 'x'
+        prediction = self.checkmove(board, otherside)
+        move = self.checkmove(board, side)
+        if move != 0:
+            self.trainingdata["".join(board)] = move
+            return move  # phone
+        elif prediction != 0:
+            self.trainingdata["".join(board)] = prediction
+            return prediction  # phone
+        else:
+            return stupidai(board, side)  # phone
+
+    def checkmove(self, board, side):
+        positions = [(1, 5, 9), (2, 6, 10), (3, 7, 11), (1, 2, 3), (5, 6, 7), (9, 10, 11), (1, 6, 11), (3, 6, 9)]
+        for i in range(len(positions)):
+            p1, p2, p3 = positions[i]
+            if board[p1] == side and board[p2] == side and board[p3] == '.':
+                return boardtophone[p3]  # phone
+            if board[p1] == side and board[p3] == side and board[p2] == '.':
+                return boardtophone[p2]  # phone
+            if board[p2] == side and board[p3] == side and board[p1] == '.':
+                return boardtophone[p1]  # phone
+        return 0  # error

@@ -145,6 +145,16 @@ from numpy import array
 #     -0.30710188, -0.16451915,  0.28287396,  0.63728198, -0.80655147],
 #    [ 0.        , -0.06228202, -0.04801003,  0.47335132,  0.96913166,
 #     -0.54748678,  0.3775301 , -0.61526925, -0.3008211 ,  0.4733433 ]]))
+# numgens = 50
+# threshold = 10**(-3)
+# ins = np.array([[1,0,0],[1,1,0],[1,0,1],[1,1,1]])
+# goal = np.array([[1,0],[1,1],[1,1],[1,0]])
+# inwidth = 2
+# hiddenwidth = 6
+# outwidth = 1
+# popsize = 30
+# pops = [NNB.random(inwidth,hiddenwidth,outwidth) for i in range(popsize)]
+# cutoff = 10
 
 gens = 10000
 threshold = 0.0001
@@ -154,6 +164,17 @@ cut = 50
 hiddenwidth = 9
 inwidth = 9*3
 outwidth = 9
+
+coach = oneturnai()
+
+for i in range(500):
+    play_game(coach,stupidai,board)
+for i in range(500):
+    play_game(coach,oneturnai(),board)
+
+print coach.trainingdata
+
+
 inputs = np.array(["""
 xox
 xxo
@@ -194,7 +215,7 @@ oox
 goal = np.array([[0,0,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,1,0],[0,0,0,0,0,0,1,0,0],[0,0,0,0,0,1,0,0,0],[0,0,0,0,1,0,0,0,0],[0,0,0,1,0,0,0,0,0],[0,0,1,0,0,0,0,0,0],[0,1,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,0]])
 popu = [NNXO.newrandom(inwidth,hiddenwidth,outwidth) for i in range(popsize)]
 xoevolve = EvolutionLearning(inputs,goal,popsize,cut,popu)
-xoevolve(gens,threshold)
+# xoevolve(gens,threshold)
 
 ultimate = NNXO(
 ihmatrix=array([[ 1.        , -0.89798043,  0.62166199, -0.67048887, -0.24466618,

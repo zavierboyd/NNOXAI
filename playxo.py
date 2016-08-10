@@ -1,3 +1,22 @@
+from __future__ import division
+from random import randint,random,choice
+import numpy as np
+from numpy import array
+from math import sqrt,exp,e
+from stratagies import *
+board = """
+...
+...
+...
+"""
+
+def newboard():
+    return """
+...
+...
+...
+"""
+
 def check(a,b,c,side,board):
     return board[a] == side and board[b] == side and board[c] == side
 
@@ -6,9 +25,9 @@ def anyonewon(board,side):
     return any([check(p1,p2,p3,side,board) for p1,p2,p3 in positions])
 
 phonetoboard = [0,1,2,3,5,6,7,9,10,11]
-see = False
-def play_game(xai,oai,board):
+def play_game(xai,oai,board,see = False):
     board = list(board)
+    listofboards=[]
     turn = 0
     win = 0
     while '.' in board:
@@ -24,13 +43,14 @@ def play_game(xai,oai,board):
                 board[phonetoboard[o_move]] = 'o'
             else:
                 return -2
-        turn += 1
+        listofboards.append(board)
         xwin = anyonewon(board,'x')
         owin = anyonewon(board,'o')
         if see:
-            print "".join(board)
+            print "".join(board),turn
         if xwin:
-            return "x wins!"
+            return "x wins!",listofboards[turn-1:]
         if owin:
             return "o wins!"
+        turn += 1
     return 0
