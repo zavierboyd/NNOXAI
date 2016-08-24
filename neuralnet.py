@@ -7,6 +7,18 @@ from stratagies import *
 __author__ = 'zavidan'
 linear = False
 
+def rectified_linear(x):
+    return np.maximum(0.0, x)
+
+def tanh_sigmoid(x):
+    return np.tanh(x)
+
+def approx_sigmoid(x):
+    return x / (1 + abs(x))
+
+def minmax_sigmoid(x):
+    return np.maximum(0.0, np.minimum(x, 1.0))
+
 
 class NN(object):
     # Built-In Functions
@@ -120,7 +132,9 @@ class NNB(NN):
 class NNXO(NN):
     """A neural network to play naughts & crosses"""
     # Built-in Functions
-    def __init__(self,ihmatrix,homatrix):
+    boardmatrix = None  # Dad Learning data for all XONeural Nets so we only have to translate the board once
+
+    def __init__(self,ihmatrix,homatrix,maxdelta = None):
         """Makes the neural network using the matrices as weights"""
         self.side = 'x'
         self.oside = 'o'
@@ -132,6 +146,10 @@ class NNXO(NN):
         self.horows = len(self.homatrix)
         if self.ihcolumns != self.horows:
             raise Exception('ihmatrix x: {} != homatrix self.ihrows: {}'.format(self.ihcolumns, self.horows))
+        if maxdelta is None:
+            self.maxdelta = random()*2-1
+        else:
+            self.maxdelta = maxdelta
 
     def __call__(self,board,side):
         self.side = side
@@ -144,21 +162,30 @@ class NNXO(NN):
 
     # Custom Functions
     def mutate(self):
-        learningrate = 0.5
         """Makes random changes to the weights"""
-        delta = (random()*2-1)*learningrate*2
+        # CHANGE MAX DELTA
+        dmaxdelta = self.maxdelta/100
+        self.maxdelta += dmaxdelta*(random()-0.5)
         # Make copy of matrix
         nihmatrix = np.copy(self.ihmatrix)
-        # Get random position on matrix. Can't be first column
-        ihrow = randint(0,len(nihmatrix)-1)
-        ihcolumn = randint(1,len(nihmatrix[0])-1)
-        # Change position's weight
-        nihmatrix[ihrow][ihcolumn] += delta
+        ihsize = np.size(nihmatrix)
+        mutates = randint(5,ihsize//10)
+        for i in range(mutates):
+            delta = (random() * 2 - 1)*self.maxdelta
+            # Get random position on matrix. Can't be first column
+            ihrow = randint(0,len(nihmatrix)-1)
+            ihcolumn = randint(1,len(nihmatrix[0])-1)
+            # Change position's weight
+            nihmatrix[ihrow][ihcolumn] += delta
         # Repeat for homatrix
         nhomatrix = np.copy(self.homatrix)
-        horow = randint(0,len(nhomatrix)-1)
-        hocolumn = randint(1,len(nhomatrix[0])-1)
-        nhomatrix[horow][hocolumn] += delta
+        hosize = np.size(nhomatrix)
+        mutates = randint(5, hosize//10)
+        for i in range(mutates):
+            delta = (random() * 2 - 1)*self.maxdelta
+            horow = randint(0,len(nhomatrix)-1)
+            hocolumn = randint(1,len(nhomatrix[0])-1)
+            nhomatrix[horow][hocolumn] += delta
         return NNXO(nihmatrix,nhomatrix)
 
     def breed(self,other,prob=0.33):
@@ -166,7 +193,7 @@ class NNXO(NN):
         # Breed ihmatrix
         # Get Mixer for Self and Other
         mix = np.random.binomial(1,prob,(self.ihrows,self.ihcolumns))
-        inmix = 1 - mix
+        inmix = (mix * -1) + 1
         # Mix Them
         smix = mix*self.ihmatrix
         omix = inmix*other.ihmatrix
@@ -175,11 +202,11 @@ class NNXO(NN):
 
         # Breed homatrix
         mix = np.random.binomial(1,prob,(self.horows,self.hocolumns))
-        inmix = 1 - mix
+        inmix = (mix * -1) + 1
         smix = mix*self.homatrix
         omix = inmix*other.homatrix
         nhomatrix = smix+omix
-        return NNXO(nihmatrix,nhomatrix)
+        return NNXO(nihmatrix,nhomatrix,self.maxdelta)
 
     def transboard(self, inputs):
         inputs = filter(lambda i: i != '\n', inputs)
@@ -197,8 +224,9 @@ class NNXO(NN):
         return move
 
     def calcout(self, inputs):
-        boardmatrix = np.array([np.hstack((np.array([1]),self.transboard(input))) for input in inputs])
-        hidden = self.calc(self.ihmatrix,boardmatrix)
+        if NNXO.boardmatrix is None: #Dad
+            NNXO.boardmatrix = np.array([np.hstack((np.array([1]),self.transboard(input))) for input in inputs])
+        hidden = self.calc(self.ihmatrix,NNXO.boardmatrix)
         output = self.calc(self.homatrix,hidden)
         output = np.array([out[1:] for out in output]) # everything execpt the offset
         return output
@@ -223,6 +251,21 @@ class NNXO(NN):
         howeight = np.random.rand(hiddenwidth+1,outwidth)*2-1
         homatrix = np.hstack((hooffset,howeight))
         return cls(ihmatrix, homatrix)
+
+
+class NNLayer(object):
+    def __init__(self, iomatrix):
+        self.iomatrix = iomatrix
+
+    def __repr__(self):
+        return "XOPerceptron(iomatrix={})".format(self.iomatrix.__repr__())
+
+    def calcout(self):
+        pass
+
+    @classmethod
+    def random(cls, inwidth, outwidth):
+        pass
 
 
 class MutationLearning(object):
@@ -281,16 +324,9 @@ class EvolutionLearning(object):
         for i in range(gens):
             self.evolvelearn()
             fitness = sorted(self.population, key=lambda person: person.error)
-            if i%100 == 0:
-                print i
-                print fitness[0].error
+            self.population = fitness
             if fitness[0].error < threshold:
                 break
-
-        print i
-        print fitness[0]
-        print fitness[0].calcout(self.inputs)
-        print fitness[0].error
 
     def evolvelearn(self):
         fittest = sorted(self.population, key=lambda person: person.error)

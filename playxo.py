@@ -49,8 +49,8 @@ def play_game(xai,oai,board,see = False):
         if see:
             print "".join(board),turn
         if xwin:
-            return "x wins!",listofboards[turn-1:]
+            return 1#"x wins!",listofboards[turn-1:]
         if owin:
-            return "o wins!"
+            return -1#"o wins!"
         turn += 1
     return 0

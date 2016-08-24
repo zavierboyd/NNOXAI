@@ -1,0 +1,44 @@
+   125464789 function calls in 113.246 seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+  3835000   35.025    0.000   58.853    0.000 neuralnet.py:197(transboard)
+  7670000   12.845    0.000   20.912    0.000 shape_base.py:9(atleast_1d)
+ 15400000   12.586    0.000   12.586    0.000 {numpy.core.multiarray.array}
+     5000    9.492    0.002  105.434    0.021 neuralnet.py:212(calcout)
+  3835000    9.285    0.000   16.659    0.000 {filter}
+ 49855000    7.374    0.000    7.374    0.000 neuralnet.py:198(<lambda>)
+  3835000    6.700    0.000   31.773    0.000 shape_base.py:232(hstack)
+  7670000    4.728    0.000    5.550    0.000 numeric.py:476(asanyarray)
+  3835000    4.161    0.000    4.161    0.000 {numpy.core.multiarray.concatenate}
+     5000    2.586    0.001    2.687    0.001 neuralnet.py:219(calcerror)
+  1386530    2.240    0.000    2.344    0.000 random.py:175(randrange)
+    10000    1.580    0.000    4.832    0.000 neuralnet.py:150(mutate)
+ 16781530    1.445    0.000    1.445    0.000 {len}
+  7670000    1.169    0.000    1.169    0.000 {method 'append' of 'list' objects}
+  1386530    0.643    0.000    2.987    0.000 random.py:238(randint)
+    10000    0.465    0.000    0.465    0.000 {method 'dot' of 'numpy.ndarray' objects}
+    10000    0.268    0.000    0.268    0.000 neuralnet.py:37(sigmoid)
+  2099795    0.162    0.000    0.162    0.000 {method 'random' of '_random.Random' objects}
+     5000    0.091    0.000    0.198    0.000 neuralnet.py:177(breed)
+    10000    0.078    0.000    0.078    0.000 {method 'binomial' of 'mtrand.RandomState' objects}
+      100    0.062    0.001  113.232    1.132 neuralnet.py:301(evolvelearn)
+    15000    0.061    0.000    0.086    0.000 neuralnet.py:123(__init__)
+     5000    0.058    0.000    0.058    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+     5000    0.025    0.000    0.097    0.000 fromnumeric.py:1737(sum)
+    10000    0.025    0.000    0.769    0.000 neuralnet.py:25(calc)
+    20000    0.014    0.000    0.042    0.000 function_base.py:894(copy)
+    10000    0.012    0.000    0.014    0.000 random.py:273(choice)
+    20101    0.012    0.000    0.012    0.000 {range}
+    10000    0.012    0.000    0.280    0.000 neuralnet.py:29(activation)
+    20000    0.009    0.000    0.009    0.000 fromnumeric.py:2652(size)
+     5000    0.008    0.000    0.008    0.000 {isinstance}
+        1    0.006    0.006  113.246  113.246 neuralnet.py:293(__call__)
+      200    0.006    0.000    0.011    0.000 {sorted}
+     5000    0.005    0.000    0.063    0.000 _methods.py:31(_sum)
+    10000    0.004    0.000    0.004    0.000 neuralnet.py:296(<lambda>)
+     5000    0.003    0.000    0.003    0.000 {math.sqrt}
+    10000    0.002    0.000    0.002    0.000 neuralnet.py:302(<lambda>)
+        1    0.000    0.000  113.246  113.246 <string>:1(<module>)
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
