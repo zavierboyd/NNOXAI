@@ -1,0 +1,10 @@
+oneturn/........./x
+oneturn/x......../o
+oneturn/.x......./o
+oneturn/..x....../o
+oneturn/...x...../o
+oneturn/....x..../o
+oneturn/.....x.../o
+oneturn/......x../o
+oneturn/.......x./o
+oneturn/........x/o
