@@ -5,6 +5,7 @@ import numpy as np
 from numpy import dot, array
 np.random.seed(1337)
 
+
 # Activation Functions
 def rectified_linear(x):
     return np.maximum(0.0, x)
@@ -135,7 +136,7 @@ class Perceptron(NNLayer_Learn):
             print dot(inputs, error) * learningrate
         nperceptron.matrix += deltamatrix
         nperceptron.offset += deltaoffset
-        return nperceptron, error
+        return nperceptron
 
     def calcangle(self, inputs, goal):
         output = self.calcout(inputs)
@@ -190,7 +191,7 @@ class Hidden(object):
         outputs = self.calcout(inputs)
         error = np.array(goal) - outputs
         for layer, input in zip(list(reversed(self.layers)), reinputs):
-            nlayer, error = layer.graddecent(input, goal, error=error)
+            nlayer = layer.graddecent(input, goal, error=error)
             error = dot(error, np.array(layer.matrix).T)
             nlayers.append(nlayer)
         nlayers = reversed(nlayers)
@@ -242,9 +243,9 @@ class XOPerceptron(Perceptron):
         return self.calcmove(board)
 
     def __repr__(self):
-        return "Perceptron(matrix={}, offset={}, activation={}, maxdelta={})".format(self.matrix.__repr__(),
-                                                                                     self.offset.__repr__(),
-                                                                                     self.activation, self.maxdelta)
+        return "XOPerceptron(matrix={}, offset={}, activation={}, maxdelta={})".format(self.matrix.__repr__(),
+                                                                                       self.offset.__repr__(),
+                                                                                       self.activation, self.maxdelta)
 
     def transboard(self, inputs):
         inputs = filter(lambda i: i != '\n', inputs)
@@ -257,7 +258,7 @@ class XOPerceptron(Perceptron):
         input = self.transboard(input)
         output = self.calcout(input)
         move = np.argmax(output.flatten())
-        return move + 1  # board plays 1-9
+        return move # board plays 0-8
 
 
 class XOHidden(Hidden):
@@ -281,7 +282,7 @@ class XOHidden(Hidden):
         output = self.calcout(input)
         #         output = output - output.mean()
         move = np.argmax(output.flatten())
-        return move  # board plays 1-9
+        return move # board plays 0-8
 
 
 class GeneticEvolution(object):
@@ -360,12 +361,21 @@ class GradeintDecent(object):
         self.inputs = inputs
         self.goal = goal
         self.genome = genome
+        self.genome.calcerror(self.inputs, self.goal)
 
-    def __call__():
-        pass
+    def __call__(self, gens, threshold):
+        for i in range(gens):
+            if self.genome.error > threshold:
+                self.learn()
+            else:
+                print 'Finished Learning', i
+                break
+            self.genome.calcerror(self.inputs, self.goal)
+        return self.genome
 
     def learn(self):
-        pass
+        for input, goal in zip(self.inputs, self.goal):
+            self.genome = self.genome.graddecent([input], goal, learningrate=0.01)
 
 
 class LayeredLearning(object):
@@ -442,5 +452,3 @@ class LayeredLearning(object):
             newlayer = self.changelayer(backPerceptron, delta)
             self.genome = self.genome.__class__([newlayer, frontPerceptron])
         return self.genome
-
-

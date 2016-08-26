@@ -22,18 +22,29 @@
                 });
             };
 
-            clickoptions = function(){
+            clickoptionbar = function(){
                 $('#selector').on('click', function(e){
                     e.preventDefault();
-                    $('#thething').toggle(500)
+                    $('#aiselection').toggle(500)
+                });
+            };
+            clicklink = function(){
+                $('.option').on('click', function(e){
+                    e.preventDefault();
+                    ai = $(this).attr('href');
+                    $('#game').load(ai, clicklink);
                 });
             };
             $(document).ready(function(){
+                // load the initial board to the game div
                 $('#game').load('static/init.html', clickable);
+                // load the navbar into the navbar div
                 $('#navbar').load('static/navbart.html');
-                $('#thething').load('static/dropdownone.html');
+                // load the options into the aiselection div
+                $('#aiselection').load('static/dropdownone.html');
                 clickmenu()
-                clickoptions()
+                clickoptionbar()
+                // when you click an option the game is played against that ai
             });
         </script>
         <title>
@@ -113,8 +124,8 @@
         <div id="selector">
             Ditzy Doo
         </div>
-        <div id="thething">
-            thething
+        <div id="aiselection">
+            aiselection
         </div>
     </body>
 </html>

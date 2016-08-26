@@ -16,7 +16,7 @@
 #
 import webapp2
 import numpy as np
-from awesomeai import frontmatrix, frontoffset, backmatrix, backoffset
+from awesomeai import frontmatrix, frontoffset, backmatrix, backoffset, percepmatrix, percepoffset
 from neuralnet2 import *
 from random import randint
 
@@ -64,7 +64,7 @@ def gengame(handler, board, urls, won):
 def stupidai2(board,side):
     solution = False
     while not solution:
-        play = np.random.randint(0,8)
+        play = np.random.randint(0,9)
         if board[play] == ".":
             solution = True
     return play #phone
@@ -129,15 +129,15 @@ def createurls(prefix, board, nextturn):
 
 
 class MainHandler(webapp2.RequestHandler):
-    def get(self):
-        with open('urls.txt', 'r') as links:
-            links = [line[:-1] for line in links.readlines()]
-        boards = [link[-11:-2] for link in links]
-        print boards
-        htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in boards]
-        links.pop(0)
-        urls = links
-        gengame(self, htmlboards[0], urls, False)
+    def get(self, ai):
+        board = '.........'
+        turn = 'o'
+        playerturn = 'x'
+        urls = createurls('/'+ai,board,playerturn)
+        html = [list(board)]
+        htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in html]
+        snippet = gengame(self, htmlboards[0], urls, False)
+        self.response.write(snippet)
 
 class StupidHandler(webapp2.RequestHandler):
     def get(self, board, turn):
@@ -221,9 +221,40 @@ class HiddenHandler(webapp2.RequestHandler):
         self.response.write(snippet)
 
 
+class PerceptronHandler(webapp2.RequestHandler):
+    neuralnet = None
+
+    def get(self, board, turn):
+        if PerceptronHandler.neuralnet is None:
+            PerceptronHandler.neuralnet = XOPerceptron(percepmatrix, percepoffset, activation=rectified_linear)
+        playerside = 'x' if turn == 'o' else 'o'
+        win = didwin(board, playerside)
+        game = list(board)
+        draw = True if ((not ('.' in game)) and (not win)) else False
+        if (not win) and (not draw):
+            board, nextturn = domove(board, turn, PerceptronHandler.neuralnet)
+            urls = createurls('/percep', board, nextturn)
+        else:
+            urls = []
+        lose = didwin(board, turn)
+        if lose:
+            urls = []
+        board = [list(board)]
+        htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in board]
+        snippet = gengame(self, htmlboards[0], urls, win or lose)
+        if win:
+            snippet += '<div>{}</div>'.format(playerside.upper() + ' Wins!')
+        elif lose:
+            snippet += '<div>{}</div>'.format(turn.upper() + ' Wins!')
+        elif draw:
+            snippet += '<div>Draw!</div>'
+        self.response.write(snippet)
+
+
 app = webapp2.WSGIApplication([
-    ('/start', MainHandler),
+    ('/start/(.*)', MainHandler),
     ('/stupid/([.ox]*)/([ox])', StupidHandler),
     ('/oneturn/([.ox]*)/([ox])', OneTurnHandler),
-    ('/hidden/([.ox]*)/([ox])', HiddenHandler)
+    ('/hidden/([.ox]*)/([ox])', HiddenHandler),
+    ('/percep/([.ox]*)/([ox])', PerceptronHandler)
 ], debug=True)
