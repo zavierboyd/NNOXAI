@@ -23,7 +23,6 @@ border-image: url(border.png) 15 repeat;
 }
 
 #selector{
-    padding-bottom: 70px;
     color: #62defd;
     font-family: 'Paytone One', sans-serif;
     margin-top:60px;
@@ -32,6 +31,32 @@ border-image: url(border.png) 15 repeat;
     margin-top: 40px;
     max-width: 414px;
     min-width: 320px;
+}
+
+#thething{
+    margin-top: 30px;
+    color: #62defd;
+    font-family: 'Paytone One', sans-serif;
+    margin-top:60px;
+    z-index: 500;
+    background-color: white;
+    margin-top: 40px;
+    max-width: 414px;
+    min-width: 320px;
+}
+
+#thething .cloud{
+    margin-top: 30px;
+}
+
+#thething img{
+    margin-top: -100px;
+    margin-left: 200px;
+}
+
+#thething p{
+    padding-left: 0px;
+    margin-top: 0px;
 }
 
 #littlebox{

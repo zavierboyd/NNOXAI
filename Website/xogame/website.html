@@ -25,13 +25,13 @@
             clickoptions = function(){
                 $('#selector').on('click', function(e){
                     e.preventDefault();
-                    $('#selector').toggle(500)
+                    $('#thething').toggle(500)
                 });
             };
             $(document).ready(function(){
                 $('#game').load('static/init.html', clickable);
                 $('#navbar').load('static/navbart.html');
-                $('#selector').load('static/dropdownone.html');
+                $('#thething').load('static/dropdownone.html');
                 clickmenu()
                 clickoptions()
             });
@@ -57,7 +57,7 @@
                 <tr>
                     <td>
                         <a class="choice" href="/stupid/x......../o">
-                            blah
+                            .
                         </a>
                     </td>
                     <td>
@@ -106,12 +106,15 @@
                     </td>
                 </tr>
             </table>
-            <div id="human">
-                Human
-            </div>
-            <div id="selector">
-                ∆ Ditzy Doo
-            </div>
+        </div>
+        <div id="human">
+            Human
+        </div>
+        <div id="selector">
+            Ditzy Doo
+        </div>
+        <div id="thething">
+            thething
         </div>
     </body>
 </html>

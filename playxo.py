@@ -49,8 +49,14 @@ def play_game(xai,oai,board,see = False):
         if see:
             print "".join(board),turn
         if xwin:
+<<<<<<< Updated upstream
             return 1#"x wins!",listofboards[turn-1:]
         if owin:
             return -1#"o wins!"
+=======
+            return 1
+        if owin:
+            return -1
+>>>>>>> Stashed changes
         turn += 1
     return 0
