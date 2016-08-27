@@ -33,7 +33,7 @@ border-image: url(border.png) 15 repeat;
     min-width: 320px;
 }
 
-#thething{
+#aiselection{
     margin-top: 30px;
     color: #62defd;
     font-family: 'Paytone One', sans-serif;
@@ -45,16 +45,45 @@ border-image: url(border.png) 15 repeat;
     min-width: 320px;
 }
 
-#thething .cloud{
+a:visited{
+    text-decoration: none;
+    color: inherit;
+}
+
+a:link{
+    text-decoration: none;
+    color: inherit;
+}
+
+a:hover{
+    text-decoration: none;
+    color: inherit;
+}
+
+#aiselection .cloud{
     margin-top: 30px;
+    margin-left: -20px;
 }
 
-#thething img{
+.playbutton{
+    margin-bottom: 20px;
+}
+
+#aiselection img{
     margin-top: -100px;
-    margin-left: 200px;
+    margin-left: 180px;
 }
 
-#thething p{
+#selector img{
+    margin-top: -100px;
+    margin-left: 180px;
+}
+
+#selector .cloud{
+    margin-left: -20px;
+}
+
+#aiselection p{
     padding-left: 0px;
     margin-top: 0px;
 }
@@ -92,10 +121,10 @@ border-image: url(border.png) 15 repeat;
     margin-top:60px;
     z-index: 500;
     background-color: white;
-    margin-top: 40px;
+    margin-top: 20px;
     max-width: 414px;
     min-width: 320px;
-    position: absolute;
+    position: fixed;
     right: 0px;
 }
 

@@ -7,46 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Paytone+One" rel="stylesheet">
         <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-        <script type="text/javascript">
-            clickable = function(){
-                $('.choice').on('click', function(e){
-                    e.preventDefault();
-                    target = $(this).attr('href');
-                    $('#game').load(target, clickable);
-                });
-            };
-            clickmenu = function(){
-                $('#littlebox').on('click', function(e){
-                    e.preventDefault();
-                    $('#navbar').toggle(500)
-                });
-            };
-
-            clickoptionbar = function(){
-                $('#selector').on('click', function(e){
-                    e.preventDefault();
-                    $('#aiselection').toggle(500)
-                });
-            };
-            clicklink = function(){
-                $('.option').on('click', function(e){
-                    e.preventDefault();
-                    ai = $(this).attr('href');
-                    $('#game').load(ai, clicklink);
-                });
-            };
-            $(document).ready(function(){
-                // load the initial board to the game div
-                $('#game').load('static/init.html', clickable);
-                // load the navbar into the navbar div
-                $('#navbar').load('static/navbart.html');
-                // load the options into the aiselection div
-                $('#aiselection').load('static/dropdownone.html');
-                clickmenu()
-                clickoptionbar()
-                // when you click an option the game is played against that ai
-            });
-        </script>
+        <script type="text/javascript" src="static/playjavascript.js"></script>
         <title>
             TicTacToe
         </title>
@@ -54,11 +15,10 @@
     <body>
         <div id='verytop'>
             My Little AI
-            <a id="littlebox" href="navbart.html">
+            <a id="littlebox" href="navbart.html" onclick="clickmenu(event)">
             </a>
         </div>
         <div id="navbar">
-
         </div>
         <p>
             You start by clicking on any box and the AI will respond. Keep on clicking the boxes until there are no more free spaces. You are X's and you are trying to get three X's i a row
@@ -122,10 +82,16 @@
             Human
         </div>
         <div id="selector">
-            Ditzy Doo
-        </div>
+            <div class="playbutton">
+                <a href="/start/stupid" onclick="playgame(event, this)">
+                    Play Game
+                </a>
+            </div>
+            <div class="cloud" onclick="clickoptionbar()">Ditzy Doo</div>
+                <img src="static/myPony.png" height="100px" width="140px">
+            </div>
         <div id="aiselection">
-            aiselection
+                aiselection
         </div>
     </body>
 </html>
