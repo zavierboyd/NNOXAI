@@ -19,6 +19,18 @@ import numpy as np
 from awesomeai import frontmatrix, frontoffset, backmatrix, backoffset, percepmatrix, percepoffset
 from neuralnet2 import *
 from random import randint
+from qlearning import database
+from google.appengine.ext import ndb
+import cPickle as cp
+from urllib import quote, unquote
+
+
+class QLearnState(ndb.Model):
+    moveprobs = ndb.StringProperty()
+
+
+class QLearnAI(ndb.Model):
+    pass
 
 def transboard(board, side):
     oside = 'o' if side == 'x' else 'x'
@@ -98,6 +110,63 @@ class oneturnai2(object):
             if board[p2] == side and board[p3] == side and board[p1] == '.':
                 return p1  # phone
         return -1  # error
+
+
+class XOQLearning(object):
+    def __init__(self, qtype ,multi=5):
+        self.database = Qlearn(qtype)
+        self.gamekeys = {}
+        self.multi = multi
+
+    def __call__(self, board, side):
+        state = ''.join(board)
+        self.side = side
+        move = self.findmove(state)
+        if board[move] != ".":
+            print state, move, self.database[state]
+        self.gamekeys[state] = move
+        return move
+
+    def learn(self, moves, score):
+        self.gamekeys = moves
+        for state, move in self.gamekeys.items():
+            probs = self.database[state]
+            probs[move][0] += score
+            probs[move][1] += 1
+            self.database[state] = probs
+
+    def findmove(self, state):
+        probs = self.database[state]
+        winchance = np.array([prob[0] / prob[1] for prob in probs])
+        y = np.exp(winchance * self.multi)
+        s = np.sum(y)
+        prob = y / s
+        c = np.cumsum(prob)
+        move = np.sum([c < np.random.random()])
+        return move
+
+class Qlearn(object):
+    def __init__(self, key):
+        self.aikey = ndb.Key(QLearnAI, key)
+        if self.aikey.get() is None:
+            top = QLearnAI(id=key)
+            self.aikey = top.put()
+
+    def __getitem__(self, state):
+        statekey = ndb.Key(QLearnState, state, parent=self.aikey)
+        data = statekey.get()
+        if data is None:
+            new = np.array([[0, 1] if bit == '.' else [-1e100, 1] for bit in state])
+            self.__setitem__(state, new)
+            probabilitys = new
+        else:
+            probabilitys = cp.loads(str(data.moveprobs))
+        return probabilitys
+
+    def __setitem__(self, state, probs):
+        moveprobs = cp.dumps(probs)
+        newdata = QLearnState(id=state, moveprobs=moveprobs, parent=self.aikey)
+        newdata.put()
 
 def domove(board, turn, ai):
     board = list(board)
@@ -251,10 +320,111 @@ class PerceptronHandler(webapp2.RequestHandler):
         self.response.write(snippet)
 
 
+class PullTestHandler(webapp2.RequestHandler):
+    def get(self):
+        d = Qlearn('online')
+        probs = d['x........']
+        self.response.write(probs)
+
+
+class PutTestHandler(webapp2.RequestHandler):
+    def get(self):
+        d = Qlearn('online')
+        nprobs = d['....x....']
+        nprobs[1][0] += 1
+        nprobs[1][1] += 1
+        d['....x....'] = nprobs
+        probs = d['....x....']
+        self.response.write(probs)
+
+
+class OfflineQHandler(webapp2.RequestHandler):
+    def get(self, board, turn):
+        qtype = 'offline'
+        aikey = ndb.Key(QLearnAI, qtype)
+        if aikey.get() is None:
+            data = Qlearn(qtype)
+            for state, probs in database.items():
+                data[state] = probs
+
+        playerside = 'x' if turn == 'o' else 'o'
+        win = didwin(board, playerside)
+        game = list(board)
+        draw = True if ((not ('.' in game)) and (not win)) else False
+        if (not win) and (not draw):
+            board, nextturn = domove(board, turn, XOQLearning(qtype))
+            urls = createurls('/qoffline', board, nextturn)
+        else:
+            urls = []
+        lose = didwin(board, turn)
+        if lose:
+            urls = []
+        board = [list(board)]
+        htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in board]
+        snippet = gengame(self, htmlboards[0], urls, win or lose)
+        if win:
+            snippet += '<div>{}</div>'.format(playerside.upper() + ' Wins!')
+        elif lose:
+            snippet += '<div>{}</div>'.format(turn.upper() + ' Wins!')
+        elif draw:
+            snippet += '<div>Draw!</div>'
+        self.response.write(snippet)
+
+
+class OnlineQHandler(webapp2.RequestHandler):
+    def get(self, board, turn):
+        qtype = 'online'
+        try:
+            pickledmemory = unquote(self.request.get('memory'))
+            print 'memory', pickledmemory
+            memory = cp.loads(str(pickledmemory))
+
+        except:
+            memory = {}
+        print 'memory', memory
+        playerside = 'x' if turn == 'o' else 'o'
+        win = didwin(board, playerside)
+        game = list(board)
+        draw = True if ((not ('.' in game)) and (not win)) else False
+        if (not win) and (not draw):
+            game = list(board)
+            move = XOQLearning(qtype)(board, turn)
+            memory[board] = move
+            game[move] = turn
+            game = "".join(game)
+            nextturn = 'o' if turn == 'x' else 'x'
+            urls = createurls('/qonline', game, nextturn)
+            pickledmemory = cp.dumps(memory)
+            print 'memory', pickledmemory
+            urls = [url+'?memory='+quote(pickledmemory) for url in urls]
+        else:
+            urls = []
+        lose = didwin(game, turn)
+        if lose:
+            urls = []
+        game = [list(game)]
+        htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in game]
+        snippet = gengame(self, htmlboards[0], urls, win or lose)
+        if win:
+            score = -1
+            XOQLearning(qtype).learn(memory, score)
+            snippet += '<div>{}</div>'.format(playerside.upper() + ' Wins!')
+        elif lose:
+            score = 1
+            XOQLearning(qtype).learn(memory, score)
+            snippet += '<div>{}</div>'.format(turn.upper() + ' Wins!')
+        elif draw:
+            snippet += '<div>Draw!</div>'
+        self.response.write(snippet)
+
+
 app = webapp2.WSGIApplication([
     ('/start/(.*)', MainHandler),
     ('/stupid/([.ox]*)/([ox])', StupidHandler),
     ('/oneturn/([.ox]*)/([ox])', OneTurnHandler),
     ('/hidden/([.ox]*)/([ox])', HiddenHandler),
-    ('/percep/([.ox]*)/([ox])', PerceptronHandler)
+    ('/percep/([.ox]*)/([ox])', PerceptronHandler),
+    ('/qoffline/([.ox]*)/([ox])', OfflineQHandler),
+    ('/qonline/([.ox]*)/([ox])', OnlineQHandler),
+    ('/pulltest', PullTestHandler)
 ], debug=True)
