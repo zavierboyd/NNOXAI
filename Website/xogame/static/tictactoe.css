@@ -23,7 +23,7 @@ border-image: url(border.png) 15 repeat;
 }
 
 #selector{
-    color: #62defd;
+    color: #0235ff;
     font-family: 'Paytone One', sans-serif;
     margin-top:60px;
     z-index: 500;
@@ -35,7 +35,7 @@ border-image: url(border.png) 15 repeat;
 
 #aiselection{
     margin-top: 30px;
-    color: #62defd;
+    color: #0235ff;
     font-family: 'Paytone One', sans-serif;
     margin-top:60px;
     z-index: 500;
@@ -131,26 +131,42 @@ a:hover{
 #navbar a{
     text-decoration: none;
     color: inherit;
+    width: 400;
 }
 
 .cloud{
-    margin-top: -50px;
-    margin-bottom: -30px;
+    width: 240px;
+    height: 160px;
+    margin-top: -100;
+    margin-bottom: -40;
+
     background-image: url(cloud.png);
-    width: 140px;
-    height: 80px;
-    padding-left: 90px;
+    background-repeat:no-repeat;
+    background-position: center center;
+
+    display: flex;           /* establish flex container */
+    flex-direction: column;  /* make main axis vertical */
+    justify-content: center; /* center items vertically, in this case */
+    align-items: center;     /* center items horizontally, in this case */
+    /*padding-left: 90px;
     padding-top: 65px;
-    padding-left: 90px;
-    padding-top: 65px;
+    padding-right: 90px;
+    padding-bottom: 65px;*/
 }
 
 .right{
-    float:right;
-}
+    display: flex;           /* establish flex container */
+        flex-direction: column;  /* make main axis vertical */
+
+    justify-content: flex-end; /* center items vertically, in this case */
+    align-items: right;     /* center items horizontally, in this case */}
 
 .left{
-    float:left;
+    display: flex;           /* establish flex container */
+        flex-direction: rox;  /* make main axis vertical */
+
+    justify-content: flex-start; /* center items vertically, in this case */
+    align-items: left;     /* center items horizontally, in this case */}
 }
 
 #game{
@@ -162,7 +178,7 @@ a:hover{
 
 p{
     font-family: 'Raleway', cursive;
-    color: #62defd;
+    color: #0235ff;
 }
 
 .board a {

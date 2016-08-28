@@ -424,7 +424,6 @@ app = webapp2.WSGIApplication([
     ('/oneturn/([.ox]*)/([ox])', OneTurnHandler),
     ('/hidden/([.ox]*)/([ox])', HiddenHandler),
     ('/percep/([.ox]*)/([ox])', PerceptronHandler),
-    ('/qoffline/([.ox]*)/([ox])', OfflineQHandler),
     ('/qonline/([.ox]*)/([ox])', OnlineQHandler),
     ('/pulltest', PullTestHandler)
 ], debug=True)

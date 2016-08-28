@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.flex-container {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: flex-start;
+    align-items: flex-end;
+    width: 400px;
+    height: 800px;
+    background-color: lightgrey;
+    flex-direction: column;
+
+}
+
+.flex-left {
+    margin-top: -10px;
+    margin-bottom: -10px;
+    background-color: yellow;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+}
+
+
+
+.flex-right {
+    background-color: green;
+
+    margin-top: -10px;
+    margin-bottom: -10px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-end;
+}
+
+.flex-item {
+    z-index:100;
+//    background-color: red;
+
+    width: 240px;
+    height: 140px;
+    margin-top: -20px;
+    margin-bottom: -40px;
+
+    background-image: url(cloud.png);
+    background-repeat:no-repeat;
+    background-position: center center;
+
+    display: flex;           /* establish flex container */
+    flex-direction: column;  /* make main axis vertical */
+    justify-content: center; /* center items vertically, in this case */
+    align-items: center;     /* center items horizontally, in this case */
+}
+
+.clickable {
+border-radius:150px;
+ border:1px solid black
+ }
+</style>
+</head>
+<body>
+
+<div class="flex-container">
+<div class="flex-left">
+  <a href="1" class="flex-item clickable"><h1>   flex <br/>second line</h1></a>
+</div>
+<div class="flex-right">
+
+  <a href="2"  class="flex-item clickable">flex item 2</a>
+</div>
+<div class="flex-left">
+  <a href="3"  class="flex-item clickable">flex item 3</a>
+</div>
+
+</div>
+
+</body>
+</html>

@@ -49,8 +49,8 @@ $(document).ready(function(){
     // load the initial board to the game div
     loadboard('static/init.html')
     // load the navbar into the navbar div
-    $('#navbar').load('static/navbart.html',hidemenu);
+    $('#navbar').load('/static/navbart.html',hidemenu);
     // load the options into the aiselection div
-    $('#aiselection').load('static/dropdownone.html');
+    $('#aiselection').load('/static/dropdownone.html');
     // when you click an option the game is played against that ai
 });
