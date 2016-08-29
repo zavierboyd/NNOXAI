@@ -4,4 +4,5 @@
     </a>
 </div>
 <div class="cloud" onclick="clickoptionbar()">Multi-Layer Perceptron</div>
-<img src="static/myPony.png" height="100px" width="140px">
+<img src="/static/myPony.png" height="100px" width="140px">
+<p>Is a perceptron with a hidden layer in between the two layers of nodes. It has 27 inputs, 9 outputs and 300 hidden nodes, it has 2 weight matrices 1st with 27 rows and 300 columns, 2nd with 300 rows and 9 columns. The activation function for the 1st weight matrix is rectified linear. The Rectified Linear activation function makes outputs of the weight matrix that are less than 0 equal to 0 and outputs that are more than 0 unchanged. The activation function for the 2nd weight matrix is Linear meaning that the output vector is unchanged. It uses the dataset of 1000 games provided by [OTA Name] for training. It’s training algorithm is Layered-Learning. Layered-Learning is when each layer is trained separately a lot with Backpropagation repeatedly except for the front layer which is trained with Gradient Descent. The front layer was trained 1000 times separately on the Strategy Training Dataset and then the back layer was trained 1000 times as well. This was repeated 5 times.</p>
