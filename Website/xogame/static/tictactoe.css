@@ -23,8 +23,9 @@ border-image: url(border.png) 15 repeat;
 }
 
 #selector{
-    color: #0235ff;
+    color: #30FCFF;
     font-family: 'Paytone One', sans-serif;
+    text-shadow: 0 0 5px #2B00FF, 0 0 10px #2B00FF, 0 0 15px #2B00FF, 0 0 20px #2B00FF, 0 0 35px #2B00FF;
     margin-top:60px;
     z-index: 500;
     background-color: white;
@@ -35,8 +36,9 @@ border-image: url(border.png) 15 repeat;
 
 #aiselection{
     margin-top: 30px;
-    color: #0235ff;
+    color: #30FCFF;
     font-family: 'Paytone One', sans-serif;
+    text-shadow: 0 0 5px #2B00FF, 0 0 10px #2B00FF, 0 0 15px #2B00FF, 0 0 20px #2B00FF, 0 0 35px #2B00FF;
     margin-top:60px;
     z-index: 500;
     background-color: white;
@@ -70,13 +72,13 @@ a:hover{
 }
 
 #aiselection img{
-    margin-top: -100px;
-    margin-left: 180px;
+    margin-top: -160px;
+    margin-left: 200px;
 }
 
 #selector img{
-    margin-top: -100px;
-    margin-left: 180px;
+    margin-top: -160px;
+    margin-left: 200px;
 }
 
 #selector .cloud{
@@ -116,7 +118,8 @@ a:hover{
 }
 #navbar{
     padding-bottom: 70px;
-    color: #62defd;
+    color: #30FCFF;
+    text-shadow: 0 0 5px #2B00FF, 0 0 10px #2B00FF, 0 0 15px #2B00FF, 0 0 20px #2B00FF, 0 0 35px #2B00FF;
     font-family: 'Paytone One', sans-serif;
     margin-top:60px;
     z-index: 500;
@@ -178,7 +181,8 @@ a:hover{
 
 p{
     font-family: 'Raleway', cursive;
-    color: #0235ff;
+    color: #1E00B3;
+    text-shadow:none;
 }
 
 .board a {

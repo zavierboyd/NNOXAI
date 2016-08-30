@@ -20,6 +20,7 @@ clickmenu = function(e){
 
 hidemenu = function(){
     $('#navbar').toggle(false);
+    $('#aiselection').toggle(false);
 };
 
 clickoptionbar = function(){
@@ -53,4 +54,5 @@ $(document).ready(function(){
     // load the options into the aiselection div
     $('#aiselection').load('/static/dropdownone.html');
     // when you click an option the game is played against that ai
+    $('#selector').load('/static/bitzydoo.html')
 });

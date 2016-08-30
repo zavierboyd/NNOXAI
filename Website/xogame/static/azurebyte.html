@@ -1,0 +1,21 @@
+<div class="playbutton">
+    <a href="/start/qoffline" onclick="playgame(event, this)">
+        Play Game
+    </a>
+</div>
+<div class="cloud" onclick="clickoptionbar()">
+    <br/>
+    Azure Byte
+</div>
+<img src="/static/azurebyte.png" height="100px" width="100px">
+<p>
+    Azure Byte has used Reinforcement Learning to learn to play tic-tac-toe. Tic-tac-toe Reinforcement Learning works by
+    Azure Byte playing against different pon-AIs. Throughout the game Azure Byte keeps a record of the boards he's seen
+    and moves he made. After the game has finished Azure Byte gets a score 1 if it won 0 if it drew and -1 if it lost.
+    He then goes through the boards and moves he's made and changes the score of the move according to the score of the
+    game as a result of those moves. When he next encounters that board he will try to pick the move with the highest
+    score. He was first trained 2000 times against Bitzy Doo playing ‘X’ and then 2000 more playing ‘O’. Both training
+    sessions with a multiplier of 0.2 . He was then trained 100000 times against Midnight Spark with a multiplier of 0.2
+    , the next 100000 times with a multiplier of 1, and the last 100000 times with a multiplier of 5, all playing ‘X’.
+    this is repeated but instead of playing ‘X’ he plays ‘O’.
+</p>
