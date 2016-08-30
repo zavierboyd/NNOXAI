@@ -262,6 +262,7 @@ class XOPerceptron(Perceptron):
 
 
 class XOHidden(Hidden):
+    multi = 1
     def __call__(self, board, side):
         self.side = side
         self.oside = 'o' if side == 'x' else 'x'
@@ -281,11 +282,11 @@ class XOHidden(Hidden):
         input = self.transboard(input)
         output = self.calcout(input)
         #         output = output - output.mean()
-        move = output.flatten()
+        move = self.findmove(output.flatten())
         return move # board plays 0-8
 
     def findmove(self, moves):
-        y = np.exp(winchance * self.multi)
+        y = rectified_linear(np.exp(moves*self.multi)-np.exp(0.5*self.multi))
         s = np.sum(y)
         prob = y / s
         c = np.cumsum(prob)

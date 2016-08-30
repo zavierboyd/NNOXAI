@@ -44,7 +44,8 @@ def printboard(board):
 
 class oneturnai2(object):
     def __init__(self):
-        pass
+        self.windata = {}
+        self.blockdata = {}
 
     def __call__(self, board, side):
         if side == 'x':
@@ -54,8 +55,10 @@ class oneturnai2(object):
         prediction = self.checkmove(board, otherside)
         move = self.checkmove(board, side)
         if move != -1:
+            self.windata[''.join(board)] = move
             return move  # phone
         elif prediction != -1:
+            self.blockdata[''.join(board)] = prediction
             return prediction  # phone
         else:
             return stupidai2(board, side)  # phone

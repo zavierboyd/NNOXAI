@@ -21,7 +21,7 @@ from neuralnet2 import *
 from random import randint
 from qlearning import database
 from google.appengine.ext import ndb
-from symbolicai import oneturnai2, stupidai2, didwin, domove
+from symbolicai import oneturnai2, stupidai2, didwin
 import cPickle as cp
 from urllib import quote, unquote
 
@@ -60,6 +60,14 @@ def gengame(handler, board, urls, won):
         html += '\n</tr>\n'
     html += '</table>'
     return html
+
+def domove(board, turn, ai):
+    board = list(board)
+    move = ai(board, turn)
+    board[move] = turn
+    board = "".join(board)
+    nextturn = 'o' if turn == 'x' else 'x'
+    return board, nextturn
 
 
 class XOQLearning(object):
@@ -360,5 +368,6 @@ app = webapp2.WSGIApplication([
     ('/hidden/([.ox]*)/([ox])', HiddenHandler),
     ('/percep/([.ox]*)/([ox])', PerceptronHandler),
     ('/qonline/([.ox]*)/([ox])', OnlineQHandler),
+    ('/qoffline/([.ox]*)/([ox])', OfflineQHandler),
     ('/pulltest', PullTestHandler)
 ], debug=True)
