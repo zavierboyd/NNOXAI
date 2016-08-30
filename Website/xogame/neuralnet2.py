@@ -281,8 +281,16 @@ class XOHidden(Hidden):
         input = self.transboard(input)
         output = self.calcout(input)
         #         output = output - output.mean()
-        move = np.argmax(output.flatten())
+        move = output.flatten()
         return move # board plays 0-8
+
+    def findmove(self, moves):
+        y = np.exp(winchance * self.multi)
+        s = np.sum(y)
+        prob = y / s
+        c = np.cumsum(prob)
+        move = np.sum([c < np.random.random()])
+        return move
 
 
 class GeneticEvolution(object):

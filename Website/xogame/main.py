@@ -21,6 +21,7 @@ from neuralnet2 import *
 from random import randint
 from qlearning import database
 from google.appengine.ext import ndb
+from symbolicai import oneturnai2, stupidai2, didwin, domove
 import cPickle as cp
 from urllib import quote, unquote
 
@@ -32,19 +33,6 @@ class QLearnState(ndb.Model):
 class QLearnAI(ndb.Model):
     pass
 
-def transboard(board, side):
-    oside = 'o' if side == 'x' else 'x'
-    side = [1 if bit == side else 0 for bit in board]
-    oside = [1 if bit == oside else 0 for bit in board]
-    space = [1 if bit == '.' else 0 for bit in board]
-    return side + oside + space
-
-def check(a,b,c,side,board):
-    return board[a] == side and board[b] == side and board[c] == side
-
-def anyonewon(board,side):
-    positions = [(1,2,3),(4,5,6),(7,8,9),(1,4,7),(2,5,8),(3,6,9),(1,5,9),(3,5,7)]
-    return any([check(p1,p2,p3,side,board) for p1,p2,p3 in positions])
 
 def gengame(handler, board, urls, won):
     html = '<table class="board">'
@@ -72,44 +60,6 @@ def gengame(handler, board, urls, won):
         html += '\n</tr>\n'
     html += '</table>'
     return html
-
-def stupidai2(board,side):
-    solution = False
-    while not solution:
-        play = np.random.randint(0,9)
-        if board[play] == ".":
-            solution = True
-    return play #phone
-
-class oneturnai2(object):
-    def __init__(self):
-        pass
-
-    def __call__(self, board, side):
-        if side == 'x':
-            otherside = 'o'
-        else:
-            otherside = 'x'
-        prediction = self.checkmove(board, otherside)
-        move = self.checkmove(board, side)
-        if move != -1:
-            return move  # phone
-        elif prediction != -1:
-            return prediction  # phone
-        else:
-            return stupidai2(board, side)  # phone
-
-    def checkmove(self, board, side):
-        positions = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
-        for i in range(len(positions)):
-            p1, p2, p3 = positions[i]
-            if board[p1] == side and board[p2] == side and board[p3] == '.':
-                return p3  # phone
-            if board[p1] == side and board[p3] == side and board[p2] == '.':
-                return p2  # phone
-            if board[p2] == side and board[p3] == side and board[p1] == '.':
-                return p1  # phone
-        return -1  # error
 
 
 class XOQLearning(object):
@@ -145,6 +95,7 @@ class XOQLearning(object):
         move = np.sum([c < np.random.random()])
         return move
 
+
 class Qlearn(object):
     def __init__(self, key):
         self.aikey = ndb.Key(QLearnAI, key)
@@ -168,23 +119,6 @@ class Qlearn(object):
         newdata = QLearnState(id=state, moveprobs=moveprobs, parent=self.aikey)
         newdata.put()
 
-def domove(board, turn, ai):
-    board = list(board)
-    move = ai(board, turn)
-    board[move] = turn
-    board = "".join(board)
-    nextturn = 'o' if turn == 'x' else 'x'
-    return board, nextturn
-
-def didwin(board, side):
-    winning = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
-    board = list(board)
-    print board
-    for a,b,c in winning:
-        if board[a] == side and board[b] == side and board[c] == side:
-            return True
-    return False
-
 def createurls(prefix, board, nextturn):
     board = list(board)
     urls = []
@@ -207,6 +141,7 @@ class MainHandler(webapp2.RequestHandler):
         htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in html]
         snippet = gengame(self, htmlboards[0], urls, False)
         self.response.write(snippet)
+
 
 class StupidHandler(webapp2.RequestHandler):
     def get(self, board, turn):
