@@ -294,6 +294,9 @@ class XOHidden(Hidden):
         return move
 
 
+
+
+
 class GeneticEvolution(object):
     def __init__(self, inputs, goal, population, cutoff):
         self.inputs = np.array(inputs)

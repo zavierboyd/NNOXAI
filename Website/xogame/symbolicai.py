@@ -149,6 +149,7 @@ class XOQLearning(object):
         return np.array([0 for i in range(9)])
 
 
+
 class datadict(dict):
     def __missing__(self, key):
         new = np.array([[0, 1] if bit == '.' else [-1e100, 1] for bit in key])
