@@ -79,7 +79,7 @@ class oneturnai2(object):
 def stupidai2(board, side):
     solution = False
     while not solution:
-        play = np.random.randint(0, 9)  # np.random.randint takes [low, high) ommiting the high number from poping up
+        play = np.random.randint(0, 9)   # np.random.randint takes [low, high) ommiting the high number from poping up
         if board[play] == ".":
             solution = True
     return play  # phone
