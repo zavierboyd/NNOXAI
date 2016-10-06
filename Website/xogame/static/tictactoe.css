@@ -22,6 +22,13 @@ border-image: url(border.png) 15 repeat;
 */
 }
 
+#thestickything{
+    position: -webkit-sticky;
+	position: sticky;
+	top: 60px;
+	background-color: rgba(255,255,255,0.95);
+}
+
 #selector{
     color: #30FCFF;
     font-family: 'Paytone One', sans-serif;
@@ -47,6 +54,12 @@ border-image: url(border.png) 15 repeat;
     min-width: 320px;
 }
 
+#winner{
+    font-family: 'Permanent Marker', cursive;
+    color: deeppink;
+    font-size: 40px;
+}
+
 a:visited{
     text-decoration: none;
     color: inherit;
@@ -69,6 +82,15 @@ a:hover{
 
 .playbutton{
     margin-bottom: 20px;
+    color: #30FCFF;
+    font-family: 'Paytone One', sans-serif;
+    text-shadow: 0 0 5px #2B00FF, 0 0 10px #2B00FF, 0 0 15px #2B00FF, 0 0 20px #2B00FF, 0 0 35px #2B00FF;
+    margin-top:60px;
+    z-index: 500;
+    background-color: white;
+    margin-top: 40px;
+    max-width: 414px;
+    min-width: 320px;
 }
 
 #aiselection img{
@@ -180,7 +202,6 @@ h1{
 
 #game{
     text-decoration: none;
-    color: red;
     font-family: 'Permanent Marker', cursive;
     font-size: 50px;
 }
@@ -198,7 +219,7 @@ p{
 
 .board td{
     border: 0px;
-	border-image: url(border.png);
+	border-image: url(board2.png);
 	border-image-slice: 20% fill;
 	border-left: 1px;
 }
@@ -206,7 +227,7 @@ p{
 .board td:nth-child(2){
     border-left:30px solid #000;
     border-right:30px solid #000;
-    border-image: url(border.png);
+    border-image: url(board2.png);
 	border-image-slice: 20% fill;
 }
 
@@ -214,7 +235,7 @@ p{
 .board tr:nth-child(2) td{
     border-top:30px solid #000;
     border-bottom:30px solid #000;
-    border-image: url(border.png);
+    border-image: url(board2.png);
 	border-image-slice: 20% fill;
 }
 
@@ -230,7 +251,8 @@ p{
     height: 100px;
     text-align: center;
     padding: 0px;
-    color: red;
+    color: deeppink;
+    text-shadow: 0 0 5px pink, 0 0 10px pink, 0 0 15px pink, 0 0 20px pink, 0 0 35px pink;
 /*  border-style: solid;
 
     border: 30px solid transparent; */

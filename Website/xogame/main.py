@@ -125,7 +125,7 @@ class Qlearn(object):
     def __setitem__(self, state, probs):
         moveprobs = cp.dumps(probs)
         newdata = QLearnState(id=state, moveprobs=moveprobs, parent=self.aikey)
-        newdata.put()
+        newdata.put_async()
 
 def createurls(prefix, board, nextturn):
     board = list(board)
@@ -169,11 +169,11 @@ class StupidHandler(webapp2.RequestHandler):
         htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in board]
         snippet = gengame(self, htmlboards[0], urls, win or lose)
         if win:
-            snippet += '<div>{}</div>'.format(playerside.upper()+' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(playerside.upper()+' Wins!')
         elif lose:
-            snippet += '<div>{}</div>'.format(turn.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(turn.upper() + ' Wins!')
         elif draw:
-            snippet += '<div>Draw!</div>'
+            snippet += "<div id='winner'>Draw!</div>"
         self.response.write(snippet)
 
 
@@ -195,11 +195,11 @@ class OneTurnHandler(webapp2.RequestHandler):
         htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in board]
         snippet = gengame(self, htmlboards[0], urls, win or lose)
         if win:
-            snippet += '<div>{}</div>'.format(playerside.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(playerside.upper() + ' Wins!')
         elif lose:
-            snippet += '<div>{}</div>'.format(turn.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(turn.upper() + ' Wins!')
         elif draw:
-            snippet += '<div>Draw!</div>'
+            snippet += "<div id='winner'>Draw!</div>"
         self.response.write(snippet)
 
 
@@ -209,6 +209,7 @@ class HiddenHandler(webapp2.RequestHandler):
     def get(self, board, turn):
         if HiddenHandler.neuralnet is None:
             HiddenHandler.neuralnet = XOHidden([Perceptron(backmatrix, backoffset, activation=rectified_linear), Perceptron(frontmatrix, frontoffset, activation=linear)])
+        HiddenHandler.neuralnet.multi = 5
         playerside = 'x' if turn == 'o' else 'o'
         win = didwin(board, playerside)
         game = list(board)
@@ -225,11 +226,11 @@ class HiddenHandler(webapp2.RequestHandler):
         htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in board]
         snippet = gengame(self, htmlboards[0], urls, win or lose)
         if win:
-            snippet += '<div>{}</div>'.format(playerside.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(playerside.upper() + ' Wins!')
         elif lose:
-            snippet += '<div>{}</div>'.format(turn.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(turn.upper() + ' Wins!')
         elif draw:
-            snippet += '<div>Draw!</div>'
+            snippet += "<div id='winner'>Draw!</div>"
         self.response.write(snippet)
 
 
@@ -255,30 +256,39 @@ class PerceptronHandler(webapp2.RequestHandler):
         htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in board]
         snippet = gengame(self, htmlboards[0], urls, win or lose)
         if win:
-            snippet += '<div>{}</div>'.format(playerside.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(playerside.upper() + ' Wins!')
         elif lose:
-            snippet += '<div>{}</div>'.format(turn.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(turn.upper() + ' Wins!')
         elif draw:
-            snippet += '<div>Draw!</div>'
+            snippet += "<div id='winner'>Draw!</div>"
         self.response.write(snippet)
 
 
 class PullTestHandler(webapp2.RequestHandler):
     def get(self):
-        d = Qlearn('online')
+        d = Qlearn('offline')
         probs = d['x........']
         self.response.write(probs)
 
 
 class PutTestHandler(webapp2.RequestHandler):
     def get(self):
-        d = Qlearn('online')
-        nprobs = d['....x....']
-        nprobs[1][0] += 1
-        nprobs[1][1] += 1
-        d['....x....'] = nprobs
-        probs = d['....x....']
-        self.response.write(probs)
+        top = QLearnAI(id='offline')
+        self.aikey = top.put()
+        i = 0
+        html = ''
+        syncs = []
+        for state, probs in database.items():
+            i += 1
+            if i % 100 == 0:
+                html += '%d' %(i)
+            moveprobs = cp.dumps(probs)
+            newdata = QLearnState(id=state, moveprobs=moveprobs, parent=self.aikey)
+            syncs.append(newdata.put_async())
+        for sync in syncs:
+            sync.get_result()
+
+        self.response.write(html)
 
 
 class OfflineQHandler(webapp2.RequestHandler):
@@ -287,15 +297,15 @@ class OfflineQHandler(webapp2.RequestHandler):
         aikey = ndb.Key(QLearnAI, qtype)
         if aikey.get() is None:
             data = Qlearn(qtype)
-            for state, probs in database.items():
-                data[state] = probs
+            i = 0
+
 
         playerside = 'x' if turn == 'o' else 'o'
         win = didwin(board, playerside)
         game = list(board)
         draw = True if ((not ('.' in game)) and (not win)) else False
         if (not win) and (not draw):
-            board, nextturn = domove(board, turn, XOQLearning(qtype))
+            board, nextturn = domove(board, turn, XOQLearning(qtype,multi=50))
             urls = createurls('/qoffline', board, nextturn)
         else:
             urls = []
@@ -306,11 +316,11 @@ class OfflineQHandler(webapp2.RequestHandler):
         htmlboards = [[[a, b, c], [d, e, f], [g, h, i]] for a, b, c, d, e, f, g, h, i in board]
         snippet = gengame(self, htmlboards[0], urls, win or lose)
         if win:
-            snippet += '<div>{}</div>'.format(playerside.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(playerside.upper() + ' Wins!')
         elif lose:
-            snippet += '<div>{}</div>'.format(turn.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(turn.upper() + ' Wins!')
         elif draw:
-            snippet += '<div>Draw!</div>'
+            snippet += "<div id='winner'>Draw!</div>"
         self.response.write(snippet)
 
 
@@ -331,7 +341,7 @@ class OnlineQHandler(webapp2.RequestHandler):
         draw = True if ((not ('.' in game)) and (not win)) else False
         if (not win) and (not draw):
             game = list(board)
-            move = XOQLearning(qtype)(board, turn)
+            move = XOQLearning(qtype, multi=2)(board, turn)
             memory[board] = move
             game[move] = turn
             game = "".join(game)
@@ -351,13 +361,13 @@ class OnlineQHandler(webapp2.RequestHandler):
         if win:
             score = -1
             XOQLearning(qtype).learn(memory, score)
-            snippet += '<div>{}</div>'.format(playerside.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(playerside.upper() + ' Wins!')
         elif lose:
             score = 1
             XOQLearning(qtype).learn(memory, score)
-            snippet += '<div>{}</div>'.format(turn.upper() + ' Wins!')
+            snippet += "<div id='winner'>{}</div>".format(turn.upper() + ' Wins!')
         elif draw:
-            snippet += '<div>Draw!</div>'
+            snippet += "<div id='winner'>Draw!</div>"
         self.response.write(snippet)
 
 
@@ -369,5 +379,5 @@ app = webapp2.WSGIApplication([
     ('/percep/([.ox]*)/([ox])', PerceptronHandler),
     ('/qonline/([.ox]*)/([ox])', OnlineQHandler),
     ('/qoffline/([.ox]*)/([ox])', OfflineQHandler),
-    ('/pulltest', PullTestHandler)
+    ('/puttest', PutTestHandler)
 ], debug=True)
