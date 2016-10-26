@@ -11,6 +11,7 @@ def playgame(xai, oai, board, see=False):
         if turn == 'x':
             nextboard, move, turn = domove(board, turn, xai)
             if board[move] != '.':
+                print '------'
                 print board
                 print move
                 return -2
@@ -18,6 +19,7 @@ def playgame(xai, oai, board, see=False):
         else:
             nextboard, move, turn = domove(board, turn, oai)
             if board[move] != '.':
+                print '------'
                 print board
                 print move
                 return 2

@@ -13,6 +13,21 @@ def stupidai(board,side):
             solution = True
     return play #phone
 
+def heuristic(board,side):
+    solution = False
+    if board.count(".") == 9 or (board.count(".") == 8 and board.count("x") == 1):
+        return 5
+    while not solution:
+        play = randint(1,9)
+        if board.count(".")>4:
+            if board[phonetoboard[play]] == "." and play not in [2,4,6,8]:
+                solution = True
+        else:
+            if board[phonetoboard[play]] == ".":
+                solution = True
+    print board.count(".")
+    return play #phone
+
 class oneturnai(object):
     def __init__(self):
         self.trainingdata = {}
@@ -32,6 +47,38 @@ class oneturnai(object):
             return prediction  # phone
         else:
             return stupidai(board, side)  # phone
+
+    def checkmove(self, board, side):
+        positions = [(1, 5, 9), (2, 6, 10), (3, 7, 11), (1, 2, 3), (5, 6, 7), (9, 10, 11), (1, 6, 11), (3, 6, 9)]
+        for i in range(len(positions)):
+            p1, p2, p3 = positions[i]
+            if board[p1] == side and board[p2] == side and board[p3] == '.':
+                return boardtophone[p3]  # phone
+            if board[p1] == side and board[p3] == side and board[p2] == '.':
+                return boardtophone[p2]  # phone
+            if board[p2] == side and board[p3] == side and board[p1] == '.':
+                return boardtophone[p1]  # phone
+        return 0  # error
+
+class oneturnheuristic(object):
+    def __init__(self):
+        self.trainingdata = {}
+
+    def __call__(self, board, side):
+        if side == 'x':
+            otherside = 'o'
+        else:
+            otherside = 'x'
+        prediction = self.checkmove(board, otherside)
+        move = self.checkmove(board, side)
+        if move != 0:
+            self.trainingdata["".join(board)] = move
+            return move  # phone
+        elif prediction != 0:
+            self.trainingdata["".join(board)] = prediction
+            return prediction  # phone
+        else:
+            return heuristic(board, side)  # phone
 
     def checkmove(self, board, side):
         positions = [(1, 5, 9), (2, 6, 10), (3, 7, 11), (1, 2, 3), (5, 6, 7), (9, 10, 11), (1, 6, 11), (3, 6, 9)]
